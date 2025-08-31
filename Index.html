@@ -1,90 +1,849 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Custom Job Page</title>
-  <!-- সুন্দর বাংলা ফন্ট -->
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-  <style>
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
-      font-family: 'Poppins', 'Noto Sans Bengali', sans-serif;
-      text-align: center;
-    }
-    .container {
-      background: #fff;
-      padding: 35px 25px;
-      border-radius: 20px;
-      box-shadow: 0px 6px 18px rgba(0,0,0,0.2);
-      max-width: 400px;
-      width: 90%;
-    }
-    .logo {
-      width: 130px;
-      height: 130px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin-bottom: 18px;
-      border: 4px solid #4CAF50;
-    }
-    .title {
-      font-size: 26px;
-      font-weight: 700;
-      color: #2e7d32;
-      margin-bottom: 10px;
-      letter-spacing: 1px;
-    }
-    .subtitle {
-      font-size: 17px;
-      font-weight: 500;
-      color: #555;
-      margin-bottom: 15px;
-    }
-    .text-bn {
-      font-size: 18px;
-      font-weight: 500;
-      color: #333;
-      margin-bottom: 25px;
-    }
-    .btn {
-      display: inline-block;
-      padding: 14px 28px;
-      font-size: 18px;
-      font-weight: bold;
-      color: white;
-      background: linear-gradient(45deg, #43a047, #1b5e20);
-      border: none;
-      border-radius: 14px;
-      cursor: pointer;
-      transition: 0.3s;
-      box-shadow: 0px 5px 12px rgba(0,0,0,0.25);
-    }
-    .btn:hover {
-      background: linear-gradient(45deg, #388e3c, #0d5302);
-      transform: scale(1.07);
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>SonarHash App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #1a202c;
+            --primary-color: #2d3748;
+            --secondary-color: #4a5568;
+            --text-color: #e2e8f0;
+            --accent-color: #3182ce;
+            --active-color: #63b3ed;
+            --success-color: #38a169;
+            --danger-color: #e53e3e;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+            padding-bottom: 80px; /* Space for bottom nav */
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            background-color: var(--primary-color);
+            border-bottom: 1px solid var(--secondary-color);
+        }
+
+        .header .profile-icon {
+            font-size: 24px;
+            margin-right: 15px;
+        }
+
+        .header .user-info .username {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .header .user-info .balance {
+            font-size: 0.9em;
+            color: var(--active-color);
+        }
+        
+        /* Verification Page */
+        #verify-page {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #verify-page .security-icon {
+            font-size: 60px;
+            color: var(--accent-color);
+            margin-bottom: 20px;
+        }
+        
+        #verify-page h2 {
+            margin-bottom: 10px;
+        }
+        
+        #verify-page p {
+            color: #a0aec0;
+            margin-bottom: 30px;
+        }
+        
+        .verify-button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            max-width: 300px;
+            transition: background-color 0.3s;
+        }
+        .verify-button:hover {
+            background-color: #2b6cb0;
+        }
+
+        /* Dashboard */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background-color: var(--primary-color);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .card .card-title {
+            font-size: 0.9em;
+            color: #a0aec0;
+            margin-bottom: 8px;
+        }
+
+        .card .card-value {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        /* Referral Section */
+        .referral-section {
+            background-color: var(--primary-color);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .referral-section h3 {
+            margin-top: 0;
+        }
+
+        .referral-link-container {
+            background-color: var(--bg-color);
+            padding: 10px;
+            border-radius: 8px;
+            margin: 15px 0;
+            word-wrap: break-word;
+            border: 1px dashed var(--secondary-color);
+        }
+
+        .referral-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #2b6cb0;
+        }
+        .btn i {
+            margin-right: 5px;
+        }
+        
+        /* Support Page */
+        .support-container {
+            text-align: center;
+        }
+        .video-icon {
+            font-size: 70px;
+            color: var(--accent-color);
+            margin: 30px 0 10px;
+        }
+        .support-container h3 {
+            margin-bottom: 20px;
+        }
+        .support-container p {
+            color: #a0aec0;
+            margin-top: 15px;
+        }
+        
+        /* Tasks Page */
+        .task-list .task-item {
+            background-color: var(--primary-color);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .task-item .task-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .task-item .task-icon {
+            font-size: 24px;
+            color: var(--active-color);
+        }
+        
+        .task-item .task-details p {
+            margin: 0;
+            font-weight: bold;
+        }
+        
+        .task-item .task-details span {
+            font-size: 0.8em;
+            color: #a0aec0;
+        }
+        
+        .task-item .task-action .btn {
+            padding: 8px 15px;
+        }
+
+        .task-item#telegram-task .task-action {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-around;
+            background-color: var(--primary-color);
+            padding: 10px 0;
+            border-top: 1px solid var(--secondary-color);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--secondary-color);
+            cursor: pointer;
+            font-size: 0.8em;
+            transition: color 0.3s;
+        }
+
+        .nav-item i {
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+
+        .nav-item.active {
+            color: var(--active-color);
+        }
+        
+        /* Welcome Popup */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .popup-box {
+            background-color: var(--primary-color);
+            padding: 25px;
+            border-radius: 15px;
+            max-width: 90%;
+            width: 340px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        
+        .popup-box .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 20px;
+            cursor: pointer;
+        }
+        
+        .popup-box h2 {
+            margin-top: 0;
+            color: #fbd38d; /* yellow */
+        }
+
+        .popup-box p {
+            font-size: 0.95em;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .popup-box .confirm-btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            width: 100%;
+            font-size: 1em;
+            cursor: pointer;
+        }
+        
+        /* Ad Page Overlay */
+        #ad-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://i.pinimg.com/736x/8c/98/99/8c98994518b575bfd8c949e91d20548b.jpg'); /* Telegram background */
+            background-size: cover;
+            background-position: center;
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .ad-notification {
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #333;
+            padding: 20px 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .ad-notification h3 {
+            margin: 0;
+            color: #2c7a7b;
+        }
+        
+        .ad-notification p {
+            margin: 5px 0 0;
+        }
+        
+        #ad-timer {
+            margin-top: 15px;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--danger-color);
+        }
+        
+        #ad-close-btn {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: var(--danger-color);
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            border: none;
+            font-size: 16px;
+            line-height: 30px;
+            cursor: pointer;
+            display: none;
+        }
+        
+        /* Utility */
+        h2 {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--text-color);
+            margin-bottom: 10px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+
+    </style>
 </head>
 <body>
-  <div class="container">
-    <img src="https://i.postimg.cc/jWgZwjDs/logo.png" alt="Logo" class="logo">
-    <div class="title">FREE DEPOSIT</div>
-    <div class="subtitle">Sadia Aktar job</div>
-    <div class="text-bn">কাজ করতে বেঁচে থাকা বাটনে টাইপ করুন</div>
-    <button class="btn" onclick="openTabs()">My Job</button>
-  </div>
 
-  <script>
-    function openTabs() {
-      for (let i = 0; i < 20; i++) {
-        window.open("https://www.profitableratecpm.com/rwjqp5zbg?key=223b345c9529d9d1c9323780c1823c43", "_blank");
-      }
-    }
-  </script>
+    <div id="verify-page">
+        <div class="security-icon"><i class="fas fa-user-shield"></i></div>
+        <h2>Verification Required</h2>
+        <p>Please verify your account through our bot to continue.</p>
+        <button class="verify-button" id="verify-now-btn">
+            <i class="fas fa-rocket"></i> Verify Now
+        </button>
+    </div>
+
+    <div id="app-container" class="hidden">
+        <div class="header">
+            <div class="profile-icon"><i class="fas fa-user-circle"></i></div>
+            <div class="user-info">
+                <div class="username" id="username-display">Loading...</div>
+                <div class="balance" id="balance-display">Balance: ৳0.00</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div id="home" class="page active">
+                <h2>Dashboard</h2>
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <div class="card-title">Daily Ads Watched</div>
+                        <div class="card-value" id="ads-watched-display">0/15</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Total Referrals</div>
+                        <div class="card-value" id="referrals-display">0</div>
+                    </div>
+                </div>
+                <div class="referral-section">
+                    <h3>Your Referral Link</h3>
+                    <div class="referral-link-container" id="ref-link">
+                        Loading your link...
+                    </div>
+                    <div class="referral-buttons">
+                        <button class="btn" id="copy-link-btn"><i class="fas fa-copy"></i> কপি লিংক</button>
+                        <button class="btn" id="share-link-btn"><i class="fas fa-share-alt"></i> শেয়ার</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="support" class="page">
+                <h2>Support</h2>
+                <div class="support-container">
+                    <div class="video-icon"><i class="fas fa-play-circle"></i></div>
+                    <h3>Tutorial Video</h3>
+                    <button class="btn" id="open-tutorial-btn">Open Tutorial Video</button>
+                    <p>ভিডিও দেখে সব কিছু বুঝে নিন</p>
+                </div>
+            </div>
+
+            <div id="tasks" class="page">
+                <h2>Complete Tasks</h2>
+                <div class="task-list">
+                    <div class="task-item" id="rewarded-ad-task">
+                        <div class="task-info">
+                            <div class="task-icon"><i class="fas fa-ad"></i></div>
+                            <div class="task-details">
+                                <p>Rewarded Ad</p>
+                                <span>প্রতিটি বিজ্ঞাপনের জন্য 5 টাকা আয় করুন।</span>
+                            </div>
+                        </div>
+                        <div class="task-action">
+                            <button class="btn" id="watch-ad-btn">Watch Ad</button>
+                        </div>
+                    </div>
+                    <div id="ad-task-info" style="text-align: center; color: #a0aec0; font-size: 0.9em; margin-top: -10px; margin-bottom: 15px;">
+                        পুরস্কার পেতে 15 সেকেন্ডের জন্য বিজ্ঞাপনে থাকুন।
+                    </div>
+                    <div id="ad-cooldown-msg" class="hidden" style="text-align: center; color: #fbd38d; background-color: var(--primary-color); padding: 15px; border-radius: 12px; margin-bottom: 15px;">
+                        আপনি আজকে 15 বার ad দেখেছেন তাই আপনি আবার <span id="cooldown-timer">15:00</span> মিনিট পর দেখতে পারবেন।
+                    </div>
+                    
+                    <div class="task-item" id="telegram-task">
+                        <div class="task-info">
+                            <div class="task-icon"><i class="fab fa-telegram-plane"></i></div>
+                            <div class="task-details">
+                                <p>Join our Telegram Channel</p>
+                                <span>Join and get 5 Taka bonus!</span>
+                            </div>
+                        </div>
+                        <div class="task-action">
+                             <button class="btn" id="open-channel-btn">Open</button>
+                             <button class="btn" id="check-claim-btn" style="background-color: var(--success-color);">Claim</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="withdraw" class="page">
+                 <h2>Withdraw</h2>
+                 <div class="card" style="text-align: left;">
+                    <p>Withdrawal functionality is coming soon.</p>
+                    <p>Minimum withdrawal amount will be announced on our channel.</p>
+                 </div>
+            </div>
+        </div>
+
+        <nav class="bottom-nav">
+            <div class="nav-item active" data-page="home">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </div>
+            <div class="nav-item" data-page="support">
+                <i class="fas fa-headset"></i>
+                <span>Support</span>
+            </div>
+            <div class="nav-item" data-page="tasks">
+                <i class="fas fa-tasks"></i>
+                <span>Tasks</span>
+            </div>
+            <div class="nav-item" data-page="withdraw">
+                <i class="fas fa-wallet"></i>
+                <span>Withdraw</span>
+            </div>
+        </nav>
+    </div>
+
+    <div id="welcome-popup" class="popup-overlay hidden">
+        <div class="popup-box">
+            <button class="close-btn" id="close-popup-btn">&times;</button>
+            <h2>স্বাগতম! 💛</h2>
+            <p>
+                আসসালামু আলাইকুম, সততার সাথে পেমেন্ট করছি। নিয়ম মেনে কাজ করলে ১০০% পেমেন্ট পাবেন ইনশাআল্লাহ 🔥
+                <br><br>
+                ⚡ <b>জয়েন্ট বোনাস:</b> ২০ টাকা<br>
+                💸 <b>প্রতি রেফারে:</b> ২৫ টাকা<br>
+                💰 <b>প্রতি বিজ্ঞাপনে:</b> ৫ টাকা<br>
+                💖 প্রতিদিন ১৫ টা করে বিজ্ঞাপন দেখার সুযোগ<br>
+                ♨️ এই সাইটে কোন ইনভেস্ট করতে হবে না সম্পূর্ণ ফ্রিতে ইনকাম করতে পারবেন ধন্যবাদ।
+                <br><br>
+                📌 ১০০% পেমেন্ট গ্যারান্টি<br>
+                😊 বিকাশ, নগদ
+                <br><br>
+                ~ কাজ করার ক্ষেত্রে কোনো ধরনের VPN ব্যবহার করবেন না। নিয়ম মেনে কাজ করুন এবং আমাদের টেলিগ্রাম চ্যানেলে যুক্ত থাকুন ✅
+            </p>
+            <button class="confirm-btn" id="confirm-popup-btn">বুঝেছি</button>
+        </div>
+    </div>
+    
+    <div id="ad-overlay">
+        <div class="ad-notification">
+            <h3>Ads</h3>
+            <p>BKash অভিনন্দন আপনি ৫ হাজার টাকা পেয়েছেন</p>
+            <div id="ad-timer">00:15</div>
+            <button id="ad-close-btn">&times;</button>
+        </div>
+    </div>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tg = window.Telegram.WebApp;
+            tg.ready();
+            tg.expand();
+            
+            // --- Firebase Configuration ---
+            const firebaseConfig = {
+              apiKey: "AIzaSyDiAqd9Xey4WCiB-p_FWTqwdksZUVEC88w",
+              authDomain: "test-941d2.firebaseapp.com",
+              databaseURL: "https://test-941d2-default-rtdb.firebaseio.com",
+              projectId: "test-941d2",
+              storageBucket: "test-941d2.firebasestorage.app",
+              messagingSenderId: "340592089396",
+              appId: "1:340592089396:web:b0611738945ffc9c052d61",
+              measurementId: "G-R1B7S25WWD"
+            };
+
+            // --- Initialize Firebase ---
+            firebase.initializeApp(firebaseConfig);
+            const database = firebase.database();
+            
+            // --- App State ---
+            let currentUser = {};
+            let userData = {
+                balance: 0,
+                adsWatched: 0,
+                referrals: 0,
+                lastAdTimestamp: 0,
+                joinedChannel: false
+            };
+            
+            // --- DOM Elements ---
+            const verifyPage = document.getElementById('verify-page');
+            const appContainer = document.getElementById('app-container');
+            const usernameDisplay = document.getElementById('username-display');
+            const balanceDisplay = document.getElementById('balance-display');
+            const adsWatchedDisplay = document.getElementById('ads-watched-display');
+            const referralsDisplay = document.getElementById('referrals-display');
+            const refLink = document.getElementById('ref-link');
+            const copyLinkBtn = document.getElementById('copy-link-btn');
+            const shareLinkBtn = document.getElementById('share-link-btn');
+            const watchAdBtn = document.getElementById('watch-ad-btn');
+            const adTaskInfo = document.getElementById('ad-task-info');
+            const adCooldownMsg = document.getElementById('ad-cooldown-msg');
+            const cooldownTimerDisplay = document.getElementById('cooldown-timer');
+            const adOverlay = document.getElementById('ad-overlay');
+            const adTimerDisplay = document.getElementById('ad-timer');
+            const adCloseBtn = document.getElementById('ad-close-btn');
+            const welcomePopup = document.getElementById('welcome-popup');
+            const telegramTask = document.getElementById('telegram-task');
+
+            // --- Bot Information ---
+            const BOT_USERNAME = 'SonarHash_bot'; // <<<<<<< আপনার বটের ইউজারনেম এখানে দিন
+            const AD_LINK = 'https://www.revenuecpmgate.com/xkunfa61?key=7aa28dc4d902f266fb23cfb4d267bf87';
+            const TUTORIAL_LINK = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'; // Placeholder
+            const CHANNEL_LINK = 'https://t.me/sonarhash';
+
+            // --- Main Function ---
+            function main() {
+                if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                    currentUser = tg.initDataUnsafe.user;
+                    checkUserVerification(currentUser.id);
+                } else {
+                    // For testing in browser
+                    currentUser = { id: 12345678, first_name: 'Test', username: 'testuser' };
+                    checkUserVerification(currentUser.id);
+                    console.warn("Telegram user data not found. Using mock data.");
+                }
+            }
+            
+            // 1. Check if user exists in Firebase
+            function checkUserVerification(userId) {
+                const userRef = database.ref('users/' + userId);
+                userRef.once('value', (snapshot) => {
+                    if (snapshot.exists()) {
+                        userData = snapshot.val();
+                        initializeApp();
+                    } else {
+                        showVerificationPage();
+                    }
+                });
+            }
+            
+            // 2. If user doesn't exist, show verification page
+            function showVerificationPage() {
+                verifyPage.style.display = 'flex';
+                appContainer.classList.add('hidden');
+                document.getElementById('verify-now-btn').addEventListener('click', () => {
+                    tg.openTelegramLink(`https://t.me/${BOT_USERNAME}?start=verify`);
+                });
+            }
+            
+            // 3. If user exists, initialize the main app
+            function initializeApp() {
+                verifyPage.style.display = 'none';
+                appContainer.classList.remove('hidden');
+
+                updateUI();
+                setupEventListeners();
+                
+                if (!sessionStorage.getItem('welcomePopupShown')) {
+                    welcomePopup.classList.remove('hidden');
+                    sessionStorage.setItem('welcomePopupShown', 'true');
+                }
+            }
+            
+            // --- UI Update Function ---
+            function updateUI() {
+                usernameDisplay.textContent = currentUser.first_name || 'User';
+                balanceDisplay.textContent = `Balance: ৳${userData.balance.toFixed(2)}`;
+                adsWatchedDisplay.textContent = `${userData.adsWatched}/15`;
+                referralsDisplay.textContent = userData.referrals || 0;
+                refLink.textContent = `https://t.me/${BOT_USERNAME}?start=${currentUser.id}`;
+
+                if (userData.joinedChannel) {
+                    telegramTask.classList.add('hidden');
+                }
+
+                checkAdCooldown();
+            }
+            
+            // --- Event Listeners ---
+            function setupEventListeners() {
+                // Navigation
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                        item.classList.add('active');
+                        
+                        document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+                        document.getElementById(item.dataset.page).classList.add('active');
+                    });
+                });
+                
+                // Popups
+                document.getElementById('close-popup-btn').addEventListener('click', () => welcomePopup.classList.add('hidden'));
+                document.getElementById('confirm-popup-btn').addEventListener('click', () => welcomePopup.classList.add('hidden'));
+                
+                // Home page buttons
+                copyLinkBtn.addEventListener('click', () => {
+                    navigator.clipboard.writeText(refLink.textContent)
+                        .then(() => tg.showAlert('Link copied!'))
+                        .catch(() => tg.showAlert('Failed to copy link.'));
+                });
+                shareLinkBtn.addEventListener('click', () => {
+                     tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(refLink.textContent)}&text=${encodeURIComponent('Join and earn money!')}`);
+                });
+                
+                // Support page button
+                document.getElementById('open-tutorial-btn').addEventListener('click', () => {
+                    tg.openLink(TUTORIAL_LINK);
+                });
+                
+                // Task buttons
+                watchAdBtn.addEventListener('click', startAd);
+                adOverlay.addEventListener('click', handleAdClick);
+                adCloseBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    closeAdOverlay(false); // Did not complete
+                });
+
+                document.getElementById('open-channel-btn').addEventListener('click', () => tg.openTelegramLink(CHANNEL_LINK));
+                document.getElementById('check-claim-btn').addEventListener('click', claimChannelBonus);
+            }
+            
+            // --- Ad Logic ---
+            let adTimerInterval;
+            
+            function checkAdCooldown() {
+                const fifteenMinutes = 15 * 60 * 1000;
+                const now = Date.now();
+                
+                if (userData.adsWatched >= 15 && (now - userData.lastAdTimestamp < fifteenMinutes)) {
+                    watchAdBtn.classList.add('hidden');
+                    adTaskInfo.classList.add('hidden');
+                    adCooldownMsg.classList.remove('hidden');
+
+                    let cooldownInterval = setInterval(() => {
+                        const timeRemaining = userData.lastAdTimestamp + fifteenMinutes - Date.now();
+                        if (timeRemaining <= 0) {
+                            clearInterval(cooldownInterval);
+                            resetAdCount();
+                        } else {
+                            const minutes = Math.floor((timeRemaining / 1000 / 60) % 60);
+                            const seconds = Math.floor((timeRemaining / 1000) % 60);
+                            cooldownTimerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                        }
+                    }, 1000);
+
+                } else if (userData.adsWatched >= 15 && (now - userData.lastAdTimestamp >= fifteenMinutes)) {
+                    resetAdCount();
+                } else {
+                    watchAdBtn.classList.remove('hidden');
+                    adTaskInfo.classList.remove('hidden');
+                    adCooldownMsg.classList.add('hidden');
+                }
+            }
+            
+            function resetAdCount() {
+                userData.adsWatched = 0;
+                database.ref(`users/${currentUser.id}/adsWatched`).set(0);
+                updateUI();
+            }
+
+            function startAd() {
+                if (userData.adsWatched >= 15) {
+                    tg.showAlert('You have watched all ads for now. Please wait.');
+                    checkAdCooldown();
+                    return;
+                }
+                
+                adOverlay.style.display = 'flex';
+                let timeLeft = 15;
+                adTimerDisplay.textContent = `00:${timeLeft}`;
+                adCloseBtn.style.display = 'none';
+
+                adTimerInterval = setInterval(() => {
+                    timeLeft--;
+                    adTimerDisplay.textContent = `00:${String(timeLeft).padStart(2, '0')}`;
+                    if (timeLeft <= 0) {
+                        clearInterval(adTimerInterval);
+                        adTimerDisplay.style.display = 'none';
+                        adCloseBtn.style.display = 'block';
+                    }
+                }, 1000);
+            }
+
+            function handleAdClick() {
+                tg.openLink(AD_LINK, {try_instant_view: false});
+                closeAdOverlay(true); // Mark as completed
+            }
+
+            function closeAdOverlay(completed) {
+                clearInterval(adTimerInterval);
+                adOverlay.style.display = 'none';
+                adTimerDisplay.style.display = 'block'; // Reset for next time
+
+                if (completed) {
+                    userData.adsWatched += 1;
+                    userData.balance += 5;
+                    userData.lastAdTimestamp = Date.now();
+                    
+                    const updates = {};
+                    updates[`users/${currentUser.id}/adsWatched`] = userData.adsWatched;
+                    updates[`users/${currentUser.id}/balance`] = userData.balance;
+                    updates[`users/${currentUser.id}/lastAdTimestamp`] = userData.lastAdTimestamp;
+                    
+                    database.ref().update(updates);
+                    
+                    tg.HapticFeedback.notificationOccurred('success');
+                    updateUI();
+                }
+            }
+            
+            // --- Channel Join Logic ---
+            function claimChannelBonus() {
+                // This is a simulation. Real verification should be done by the bot.
+                // The bot would check membership and update the database.
+                // Here, we assume the user has joined and just update the front-end and DB.
+                if (!userData.joinedChannel) {
+                    userData.balance += 5;
+                    userData.joinedChannel = true;
+                    
+                    const updates = {};
+                    updates[`users/${currentUser.id}/balance`] = userData.balance;
+                    updates[`users/${currentUser.id}/joinedChannel`] = true;
+                    
+                    database.ref().update(updates).then(() => {
+                        tg.showAlert('Congratulations! You received 5 Taka.');
+                        updateUI();
+                    });
+                } else {
+                    tg.showAlert('You have already claimed this bonus.');
+                }
+            }
+            
+            // --- Start the app ---
+            main();
+        });
+    </script>
 </body>
-</html>
+  </html>j
